@@ -1660,16 +1660,10 @@ class CompendiumBrowser extends Application {
         this.addNpcFilter("CMPBrowser.general", "SW5E.CreatureType", npcDetailsPath, 'text', {
             aberration: "SW5E.CreatureAberration",
             beast: "SW5E.CreatureBeast",
-            celestial: "SW5E.CreatureCelestial",
             construct: "SW5E.CreatureConstruct",
-            dragon: "SW5E.CreatureDragon",
-            elemental: "SW5E.CreatureElemental",
-            fey: "SW5E.CreatureFey",
-            fiend: "SW5E.CreatureFiend",
-            giant: "SW5E.CreatureGiant",
+            droid: "SW5E.CreatureDroid",
+            force: "SW5E.CreatureForce",
             humanoid: "SW5E.CreatureHumanoid",
-            monstrosity: "SW5E.CreatureMonstrosity",
-            ooze: "SW5E.CreatureOoze",
             plant: "SW5E.CreaturePlant",
             undead: "SW5E.CreatureUndead"
         });
