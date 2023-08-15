@@ -21,7 +21,7 @@
           "url": "https://github.com/joevaughan"
         }
       ],
-    "systems": ["dnd5e"],
+    "systems": ["sw5e"],
     "scripts": ["./compendium-browser.js"],
     "styles": ["./compendium-browser.css"],
     "packs": [],

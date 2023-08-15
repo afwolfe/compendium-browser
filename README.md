@@ -7,7 +7,7 @@ Compendium Browser is faster and better-behaved; **it no longer loads all the co
 * **Authors**: Discord: Spetzel#0103; Felix (felix.mueller.86@web.de); ZoltantheDM (Zoltan#8700); eduardopato41
 * **Version**: 0.9.0
 * **Foundry VTT Compatibility**: 9-10
-* **System Compatibility (If applicable)**: dnd5e
+* **System Compatibility (If applicable)**: sw5e
 * **Translation Support**: en, de (thanks https://github.com/CarnVanBeck), es (thanks https://github.com/JJBocanegra), fr, ja, pt-BR
 
 [Patch Notes](https://github.com/ZoltanTheDM/compendium-browser/blob/master/Patchnotes.md)
