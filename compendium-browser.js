@@ -1,4 +1,4 @@
-/* eslint-disable valid-jsdoc */
+﻿/* eslint-disable valid-jsdoc */
 /* eslint-disable complexity */
 /**
  * @author Felix Müller aka syl3r86
@@ -1567,21 +1567,20 @@ class CompendiumBrowser extends Application {
         {
             this.addFeatFilter("CMPBrowser.general", "SW5E.Source", 'data.source', 'text');
         }
+
         this.addFeatFilter("CMPBrowser.general", "ITEM.TypeClass", 'classRequirement', 'select',
             {
-                artificer: "CMPBrowser.artificer",
-                barbarian: "CMPBrowser.barbarian",
-                bard: "CMPBrowser.bard",
-                cleric: "CMPBrowser.cleric",
-                druid: "CMPBrowser.druid",
+                berserker: "CMPBrowser.berserker",
+                consular: "CMPBrowser.consular",
+                engineer: "CMPBrowser.engineer",
                 fighter: "CMPBrowser.fighter",
+                guardian: "CMPBrowser.guardian",
                 monk: "CMPBrowser.monk",
-                paladin: "CMPBrowser.paladin",
-                ranger: "CMPBrowser.ranger",
-                rogue: "CMPBrowser.rogue",
-                sorcerer: "CMPBrowser.sorcerer",
-                warlock: "CMPBrowser.warlock",
-                wizard: "CMPBrowser.wizard"
+                operative: "CMPBrowser.operative",
+                scholar: "CMPBrowser.scholar",
+                scout: "CMPBrowser.scout",
+                sentinel: "CMPBrowser.sentinel"
+                
             }, true);
 
         let featureTypes = {
