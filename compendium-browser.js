@@ -1,4 +1,4 @@
-﻿/* eslint-disable valid-jsdoc */
+/* eslint-disable valid-jsdoc */
 /* eslint-disable complexity */
 /**
  * @author Felix Müller aka syl3r86
@@ -475,13 +475,15 @@ class CompendiumBrowser extends Application {
             });
         }
 
-        if (!this.subClasses) {
-            this.subClasses = await fetch('modules/compendium-browser/sub-classes.json').then(result => {
-                return result.json();
-            }).then(obj => {
-                return this.subClasses = obj;
-            });
-        }
+        // FIXME: Update archetypes for sw5e
+        // if (!this.archetypes) {
+        //     this.archetypes = await fetch('modules/compendium-browser/sub-classes.json').then(result => {
+        //         return result.json();
+        //     }).then(obj => {
+        //         return this.archetypes = obj;
+        //     });
+        // }
+        this.archetypes = {};
     }
 
     async loadAndFilterItems(browserTab="power",updateLoading=null) {
@@ -559,7 +561,7 @@ class CompendiumBrowser extends Application {
 
                                 const decoratedItem = this.decorateItem(item5e);
 
-                                if(decoratedItem && ["feat","class","subclass", "background"].includes(decoratedItem.type) && this.passesFilter(decoratedItem, this.featFilters.activeFilters)){
+                                if(decoratedItem && ["feat","class","archetype", "background"].includes(decoratedItem.type) && this.passesFilter(decoratedItem, this.featFilters.activeFilters)){
                                     itemsList[item5e.id] = {
                                         compendium : pack.collection,
                                         name : decoratedItem.name,
@@ -586,7 +588,7 @@ class CompendiumBrowser extends Application {
 
                                 const decoratedItem = this.decorateItem(item5e);
 
-                                if(decoratedItem && !["power","feat","class","subclass", "background"].includes(decoratedItem.type) && this.passesFilter(decoratedItem, this.itemFilters.activeFilters)){
+                                if(decoratedItem && !["power","feat","class","archetype", "background"].includes(decoratedItem.type) && this.passesFilter(decoratedItem, this.itemFilters.activeFilters)){
                                     itemsList[item5e.id] = {
                                         compendium : pack.collection,
                                         name : decoratedItem.name,
@@ -1057,12 +1059,12 @@ class CompendiumBrowser extends Application {
             // getting class
             let reqString = item.requirements?.replace(/[0-9]/g, '').trim();
             let matchedClass = [];
-            for (let c in this.subClasses) {
+            for (let c in this.archetypes) {
                 if (reqString && reqString.toLowerCase().indexOf(c) !== -1) {
                     matchedClass.push(c);
                 } else {
-                    for (let subClass of this.subClasses[c]) {
-                        if (reqString && reqString.indexOf(subClass) !== -1) {
+                    for (let archetype of this.archetypes[c]) {
+                        if (reqString && reqString.indexOf(archetype) !== -1) {
                             matchedClass.push(c);
                             break;
                         }
@@ -1079,8 +1081,8 @@ class CompendiumBrowser extends Application {
             if (!CompendiumBrowser.isFoundryV10Plus) {
                 item.hasSave = item5e.hasSave;
             }
-        } else  if (item.type === 'subclass') {
-            //subclasses dont exist lower then version 10
+        } else  if (item.type === 'archetype') {
+            //archetypes dont exist lower then version 10
             item.classRequirement = [item.system.classIdentifier];
             item.classRequirementString = item.system.classIdentifier
         } else {
@@ -1498,6 +1500,7 @@ class CompendiumBrowser extends Application {
             tool: "ITEM.TypeTool",
             weapon: "ITEM.TypeWeapon"
         });
+        // TODO: Update matchedPacks filter for sw5e
         this.addItemFilter("CMPBrowser.general", "CMPBrowser.ItemsPacks", 'matchedPacks', 'select',
             {
                 burglar: "CMPBrowser.ItemsPacksBurglar",
@@ -1581,9 +1584,9 @@ class CompendiumBrowser extends Application {
             feat: "ITEM.TypeFeat",
         };
 
-        //subclasses don't exist lower then version 10
+        //archetypes don't exist lower then version 10
         if (CompendiumBrowser.isFoundryV10Plus) {
-            featureTypes.subclass = "ITEM.TypeSubclass";
+            featureTypes.archetype = "ITEM.TypeArchetype";
             featureTypes.background = "SW5E.Background";
         }
 
