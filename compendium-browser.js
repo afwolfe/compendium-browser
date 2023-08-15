@@ -1542,11 +1542,12 @@ class CompendiumBrowser extends Application {
             //0.7.2c: Fix rarity encoding (uses camelcase names)
             this.addItemFilter("CMPBrowser.MagicItems", "SW5E.Rarity", 'data.rarity', 'select', 
             {
-                common: "SW5E.ItemRarityCommon",
-                uncommon: "SW5E.ItemRarityUncommon",
-                rare: "SW5E.ItemRarityRare",
-                veryRare: "SW5E.ItemRarityVeryRare",
+                standard: "SW5E.ItemRarityStandard",
+                premium: "SW5E.ItemRarityPremium",
+                prototype: "SW5E.ItemRarityPrototype",
+                advanced: "SW5E.ItemRarityAdvanced",
                 legendary: "SW5E.ItemRarityLegendary",
+                artifact: "SW5E.ItemRarityArtifact"
             });
         }
     }
