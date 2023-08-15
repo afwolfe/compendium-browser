@@ -1504,19 +1504,19 @@ class CompendiumBrowser extends Application {
             tool: "ITEM.TypeTool",
             weapon: "ITEM.TypeWeapon"
         });
-        // TODO: Update matchedPacks filter for sw5e
-        this.addItemFilter("CMPBrowser.general", "CMPBrowser.ItemsPacks", 'matchedPacks', 'select',
-            {
-                burglar: "CMPBrowser.ItemsPacksBurglar",
-                diplomat: "CMPBrowser.ItemsPacksDiplomat",
-                dungeoneer: "CMPBrowser.ItemsPacksDungeoneer",
-                entertainer: "CMPBrowser.ItemsPacksEntertainer",
-                explorer: "CMPBrowser.ItemsPacksExplorer",
-                monsterhunter: "CMPBrowser.ItemsPacksMonsterHunter",
-                priest: "CMPBrowser.ItemsPacksPriest",
-                scholar: "CMPBrowser.ItemsPacksScholar",
-            }, true
-        );
+        // FIXME: Update matchedPacks filter for sw5e
+        // this.addItemFilter("CMPBrowser.general", "CMPBrowser.ItemsPacks", 'matchedPacks', 'select',
+        //     {
+        //         burglar: "CMPBrowser.ItemsPacksBurglar",
+        //         diplomat: "CMPBrowser.ItemsPacksDiplomat",
+        //         dungeoneer: "CMPBrowser.ItemsPacksDungeoneer",
+        //         entertainer: "CMPBrowser.ItemsPacksEntertainer",
+        //         explorer: "CMPBrowser.ItemsPacksExplorer",
+        //         monsterhunter: "CMPBrowser.ItemsPacksMonsterHunter",
+        //         priest: "CMPBrowser.ItemsPacksPriest",
+        //         scholar: "CMPBrowser.ItemsPacksScholar",
+        //     }, true
+        // );
         if (CompendiumBrowser.isFoundryV10Plus) {
             this.addItemFilter("CMPBrowser.GameMechanics", "SW5E.ItemActivationCost", 'system.activation.type', 'select', CONFIG.SW5E.abilityActivationTypes);
         }
