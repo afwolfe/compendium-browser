@@ -459,21 +459,25 @@ class CompendiumBrowser extends Application {
 
     async checkListsLoaded() {
         //Provides extra info not in the standard SRD, like which classes can learn a power
-        if (!this.classList) {
-            this.classList = await fetch('modules/compendium-browser/power-classes.json').then(result => {
-                return result.json();
-            }).then(obj => {
-                return this.classList = obj;
-            });
-        }
+        // FIXME: Update classList for sw5e
+        // if (!this.classList) {
+        //     this.classList = await fetch('modules/compendium-browser/power-classes.json').then(result => {
+        //         return result.json();
+        //     }).then(obj => {
+        //         return this.classList = obj;
+        //     });
+        // }
+        this.classList = {};
 
-        if (!this.packList) {
-            this.packList = await fetch('modules/compendium-browser/item-packs.json').then(result => {
-                return result.json();
-            }).then(obj => {
-                return this.packList = obj;
-            });
-        }
+        // FIXME: Update packList for sw5e
+        // if (!this.packList) {
+        //     this.packList = await fetch('modules/compendium-browser/item-packs.json').then(result => {
+        //         return result.json();
+        //     }).then(obj => {
+        //         return this.packList = obj;
+        //     });
+        // }
+        this.packList = {};
 
         // FIXME: Update archetypes for sw5e
         // if (!this.archetypes) {
