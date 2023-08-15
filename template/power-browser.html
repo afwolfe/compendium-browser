@@ -1,0 +1,25 @@
+<div class="power-browser browser flexrow">
+    <div class="control-area">
+        <div class="filtercontainer" id="tagfilter">            
+            <div class="filter"  data-type="text" data-path="name">
+                <input class="" name="textFilter" type="text" value="" data-dtype="String" placeholder="{{localize "Name"}}"/>
+            </div>
+            <dl id="sorter">
+                <dt>{{localize "CMPBrowser.sortBy"}}:</dt>
+                <dd><select class="null" name="sortorder">
+                    <option value="true" selected>{{localize "Name"}}</option>
+                    <option value="false">{{localize "SW5E.Level"}}</option>
+                </select></dd>
+            </dl> 
+            <button id="reset-power-filter">{{localize "CMPBrowser.Filters.ResetFilters"}}</button>
+            <button id="copy-search-power">Export to JS</button>
+        </div>
+        {{> "modules/compendium-browser/template/filter-container.html" filters=powerFilters}}
+    </div>
+    <div class="list-area flexcol">
+        <span id="CBPowersMessage" style="flex:0"></span>
+        <ul id="CBPowers">
+            {{> "modules/compendium-browser/template/power-browser-list.html" powers=items}}
+        </ul>
+    </div>
+</div>

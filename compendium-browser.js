@@ -76,7 +76,7 @@ class CompendiumBrowser extends Application {
         const options = super.defaultOptions;
         mergeObject(options, {
             title: "CMPBrowser.compendiumBrowser",
-            tabs: [{navSelector: ".tabs", contentSelector: ".content", initial: "spell"}],
+            tabs: [{navSelector: ".tabs", contentSelector: ".content", initial: "power"}],
             classes: options.classes.concat('compendium-browser'),
             template: "modules/compendium-browser/template/template.html",
             width: 800,
@@ -94,8 +94,8 @@ class CompendiumBrowser extends Application {
         } 
 
         await loadTemplates([
-            "modules/compendium-browser/template/spell-browser.html",
-            "modules/compendium-browser/template/spell-browser-list.html",       
+            "modules/compendium-browser/template/power-browser.html",
+            "modules/compendium-browser/template/power-browser-list.html",       
             "modules/compendium-browser/template/npc-browser.html",
             "modules/compendium-browser/template/npc-browser-list.html",
             "modules/compendium-browser/template/feat-browser.html",
@@ -111,7 +111,7 @@ class CompendiumBrowser extends Application {
         this.hookCompendiumList();
         
         //Reset the filters used in the dialog
-        this.spellFilters = {
+        this.powerFilters = {
             registeredFilterCategorys: {},
             activeFilters: {}
         };
@@ -149,8 +149,8 @@ class CompendiumBrowser extends Application {
         let data = {
             items : [],
             npcs: [],
-            spellFilters : this.spellFilters,
-            showSpellBrowser : (game.user.isGM || this.settings.allowSpellBrowser),
+            powerFilters : this.powerFilters,
+            showPowerBrowser : (game.user.isGM || this.settings.allowPowerBrowser),
             featFilters : this.featFilters,
             showFeatBrowser : (game.user.isGM || this.settings.allowFeatBrowser),
             itemFilters : this.itemFilters,
@@ -232,18 +232,18 @@ class CompendiumBrowser extends Application {
         });
         html.find('.multiselect label').trigger('click');
 
-        // sort spell list
-        html.find('.spell-browser select[name=sortorder]').on('change', ev => {
-            let spellList = html.find('.spell-browser li');
+        // sort power list
+        html.find('.power-browser select[name=sortorder]').on('change', ev => {
+            let powerList = html.find('.power-browser li');
             let byName = (ev.target.value == 'true');
-            let sortedList = this.sortSpells(spellList, byName);
-            let ol = $(html.find('.spell-browser ul'));
+            let sortedList = this.sortPowers(powerList, byName);
+            let ol = $(html.find('.power-browser ul'));
             ol[0].innerHTML = [];
             for (let element of sortedList) {
                 ol[0].append(element);
             }
         });
-        this.triggerSort(html, "spell");
+        this.triggerSort(html, "power");
 
         // sort feat list in place
         html.find('.feat-browser select[name=sortorder]').on('change', ev => {
@@ -284,7 +284,7 @@ class CompendiumBrowser extends Application {
         });
         this.triggerSort(html, "npc");
 
-        for (let tab of ["spell", "feat", "item", "npc"]){
+        for (let tab of ["power", "feat", "item", "npc"]){
             // reset filters and re-render
             //0.4.3: Reset ALL filters because when we do a re-render it affects all tabs
             html.find(`#reset-${tab}-filter`).click(ev => {
@@ -304,9 +304,9 @@ class CompendiumBrowser extends Application {
         html.find('.settings input').on('change', ev => {
             let setting = ev.target.dataset.setting;
             let value = ev.target.checked;
-            if (setting === 'spell-compendium-setting') {
+            if (setting === 'power-compendium-setting') {
                 let key = ev.target.dataset.key;
-                this.settings.loadedSpellCompendium[key].load = value;
+                this.settings.loadedPowerCompendium[key].load = value;
                 this.render();
                 ui.notifications.info("Settings Saved. Item Compendiums are being reloaded.");
             } else if (setting === 'npc-compendium-setting') {
@@ -315,8 +315,8 @@ class CompendiumBrowser extends Application {
                 this.render();
                 ui.notifications.info("Settings Saved. NPC Compendiums are being reloaded.");
             }
-            if (setting === 'allow-spell-browser') {
-                this.settings.allowSpellBrowser = value;
+            if (setting === 'allow-power-browser') {
+                this.settings.allowPowerBrowser = value;
             }
             if (setting === 'allow-feat-browser') {
                 this.settings.allowFeatBrowser = value;
@@ -383,7 +383,7 @@ class CompendiumBrowser extends Application {
             this.replaceList(html, browserTab);
 
 
-            // console.log(this.spellFilters.activeFilters);
+            // console.log(this.powerFilters.activeFilters);
             // console.log(this.featFilters.activeFilters);
             // console.log(this.itemFilters.activeFilters);
             // console.log(this.npcFilters.activeFilters);
@@ -458,9 +458,9 @@ class CompendiumBrowser extends Application {
     }
 
     async checkListsLoaded() {
-        //Provides extra info not in the standard SRD, like which classes can learn a spell
+        //Provides extra info not in the standard SRD, like which classes can learn a power
         if (!this.classList) {
-            this.classList = await fetch('modules/compendium-browser/spell-classes.json').then(result => {
+            this.classList = await fetch('modules/compendium-browser/power-classes.json').then(result => {
                 return result.json();
             }).then(obj => {
                 return this.classList = obj;
@@ -484,7 +484,7 @@ class CompendiumBrowser extends Application {
         }
     }
 
-    async loadAndFilterItems(browserTab="spell",updateLoading=null) {
+    async loadAndFilterItems(browserTab="power",updateLoading=null) {
         console.log(`Load and Filter Items | Started loading ${browserTab}s`);
         console.time("loadAndFilterItems");
         await this.checkListsLoaded();
@@ -495,26 +495,26 @@ class CompendiumBrowser extends Application {
 
         const maxLoad = game.settings.get(CMPBrowser.MODULE_NAME, "maxload") ?? CMPBrowser.MAXLOAD;
 
-        //0.4.1: Load and filter just one of spells, feats, and items (specified by browserTab)
-        let unfoundSpells = '';
+        //0.4.1: Load and filter just one of powers, feats, and items (specified by browserTab)
+        let unfoundPowers = '';
         let numItemsLoaded = 0;
         let compactItems = {};
 
         try{
             //Filter the full list, but only save the core compendium information + displayed info 
             for (let pack of game.packs) {
-                if (pack.documentName === "Item" && this.settings.loadedSpellCompendium[pack.collection].load) {
-                    //can query just for spells since there is only 1 type
+                if (pack.documentName === "Item" && this.settings.loadedPowerCompendium[pack.collection].load) {
+                    //can query just for powers since there is only 1 type
                     let query = {};
-                    if (browserTab === "spell") {
-                        query = {type: "spell"};
+                    if (browserTab === "power") {
+                        query = {type: "power"};
                     }
 
                     //FIXME: How much could we do with the loaded index rather than all content? 
                     //OR filter the content up front for the decoratedItem.type??
                     await pack.getDocuments(query).then(content => {
 
-                        if (browserTab === "spell"){
+                        if (browserTab === "power"){
 
                             content.reduce(function(itemsList, item5e) {
                                 if (this.CurrentSeachNumber != seachNumber) throw STOP_SEARCH;
@@ -528,7 +528,7 @@ class CompendiumBrowser extends Application {
 
                                 const decoratedItem = this.decorateItem(item5e);
 
-                                if(decoratedItem && this.passesFilter(decoratedItem, this.spellFilters.activeFilters)){
+                                if(decoratedItem && this.passesFilter(decoratedItem, this.powerFilters.activeFilters)){
                                     itemsList[item5e.id] = {
                                         compendium : pack.collection,
                                         name : decoratedItem.name,
@@ -586,7 +586,7 @@ class CompendiumBrowser extends Application {
 
                                 const decoratedItem = this.decorateItem(item5e);
 
-                                if(decoratedItem && !["spell","feat","class","subclass", "background"].includes(decoratedItem.type) && this.passesFilter(decoratedItem, this.itemFilters.activeFilters)){
+                                if(decoratedItem && !["power","feat","class","subclass", "background"].includes(decoratedItem.type) && this.passesFilter(decoratedItem, this.itemFilters.activeFilters)){
                                     itemsList[item5e.id] = {
                                         compendium : pack.collection,
                                         name : decoratedItem.name,
@@ -618,9 +618,9 @@ class CompendiumBrowser extends Application {
         // this.removeDuplicates(compactItems);
 /*
 
-        if (unfoundSpells !== '') {
-            console.log(`Load and Fliter Items | List of Spells that don't have a class associated to them:`);
-            console.log(unfoundSpells);
+        if (unfoundPowers !== '') {
+            console.log(`Load and Fliter Items | List of Powers that don't have a class associated to them:`);
+            console.log(unfoundPowers);
         }      
 */
         this.itemsLoaded = true;  
@@ -750,7 +750,7 @@ class CompendiumBrowser extends Application {
         if (this.settings === undefined) {
             this.initSettings();
         }
-        if (game.user.isGM || this.settings.allowSpellBrowser || this.settings.allowNpcBrowser) {
+        if (game.user.isGM || this.settings.allowPowerBrowser || this.settings.allowNpcBrowser) {
             const cbButton = $(`<button class="compendium-browser-btn"><i class="fas fa-fire"></i> ${game.i18n.localize("CMPBrowser.compendiumBrowser")}</button>`);
             html.find('.compendium-browser-btn').remove();
 
@@ -764,8 +764,8 @@ class CompendiumBrowser extends Application {
                 this.resetFilters();
                 //0.4.3: Reset everything (including data) when you press the button - calls afterRender() hook
                  
-                if (game.user.isGM || this.settings.allowSpellBrowser) {
-                    this.refreshList = "spell";
+                if (game.user.isGM || this.settings.allowPowerBrowser) {
+                    this.refreshList = "power";
                 } else if (this.settings.allowFeatBrowser) {
                     this.refreshList = "feat";
                 } else if (this.settings.allowItemBrowser) {
@@ -797,7 +797,7 @@ class CompendiumBrowser extends Application {
     }
 
     resetFilters() {
-        this.spellFilters.activeFilters = {};
+        this.powerFilters.activeFilters = {};
         this.featFilters.activeFilters = {};
         this.itemFilters.activeFilters = {};
         this.npcFilters.activeFilters = {};
@@ -811,9 +811,9 @@ class CompendiumBrowser extends Application {
         let elements = null;
         //0.4.2 Display a Loading... message while the data is being loaded and filtered
         let loadingMessage = null;
-        if (browserTab === 'spell') {
-            elements = html.find("ul#CBSpells");
-            loadingMessage = html.find("#CBSpellsMessage");
+        if (browserTab === 'power') {
+            elements = html.find("ul#CBPowers");
+            loadingMessage = html.find("#CBPowersMessage");
         } else if (browserTab === 'npc') {
             elements = html.find("ul#CBNPCs");
             loadingMessage = html.find("#CBNpcsMessage");            
@@ -872,8 +872,8 @@ class CompendiumBrowser extends Application {
 
     //SORTING
     triggerSort(html, browserTab) {
-        if (browserTab === 'spell') {
-            html.find('.spell-browser select[name=sortorder]').trigger('change');
+        if (browserTab === 'power') {
+            html.find('.power-browser select[name=sortorder]').trigger('change');
         } else if (browserTab === 'feat') {
             html.find('.feat-browser select[name=sortorder]').trigger('change');
         } else if (browserTab === 'npc') {
@@ -885,7 +885,7 @@ class CompendiumBrowser extends Application {
 
 
 
-    sortSpells(list, byName) {
+    sortPowers(list, byName) {
         if (byName) {
             list.sort((a, b) => {
                 let aName = $(a).find('.item-name a')[0].innerHTML;
@@ -1043,15 +1043,15 @@ class CompendiumBrowser extends Application {
             }
         }
 
-        if (item.type === 'spell') {
-            // determining classes that can use the spell
-            let cleanSpellName = item.name.toLowerCase().replace(/[^一-龠ぁ-ゔァ-ヴーa-zA-Z0-9ａ-ｚＡ-Ｚ０-９々〆〤]/g, '').replace("'", '').replace(/ /g, '');
-            //let cleanSpellName = spell.name.toLowerCase().replace(/[^a-zA-Z0-9\s:]/g, '').replace("'", '').replace(/ /g, '');
-            if (this.classList[cleanSpellName]) {
-                let classes = this.classList[cleanSpellName];
+        if (item.type === 'power') {
+            // determining classes that can use the Power
+            let cleanPowerName = item.name.toLowerCase().replace(/[^一-龠ぁ-ゔァ-ヴーa-zA-Z0-9ａ-ｚＡ-Ｚ０-９々〆〤]/g, '').replace("'", '').replace(/ /g, '');
+            //let cleanPowerName = Power.name.toLowerCase().replace(/[^a-zA-Z0-9\s:]/g, '').replace("'", '').replace(/ /g, '');
+            if (this.classList[cleanPowerName]) {
+                let classes = this.classList[cleanPowerName];
                 item.classes = classes.split(',');
             } else {
-                //FIXME: unfoundSpells += cleanSpellName + ',';
+                //FIXME: unfoundPowers += cleanPowerName + ',';
             }
         } else  if (item.type === 'feat' || item.type === 'class') {
             // getting class
@@ -1155,8 +1155,8 @@ class CompendiumBrowser extends Application {
                 default: decoratedNpc.filterSize = 2; break;
             }
 
-            // getting value for HasSpells and damage types
-            decoratedNpc.hasSpells = decoratedNpc.items?.type?.reduce((hasSpells, itemType) => hasSpells || itemType === 'spell', false);
+            // getting value for HasPowers and damage types
+            decoratedNpc.hasPowers = decoratedNpc.items?.type?.reduce((hasPowers, itemType) => hasPowers || itemType === 'power', false);
             let npcDamagePart;
             if (CompendiumBrowser.isFoundryV10Plus) {
                 npcDamagePart = decoratedNpc.items?.system?.damage?.parts;
@@ -1256,9 +1256,9 @@ class CompendiumBrowser extends Application {
     }
 
     //incomplete removal of duplicate items
-    removeDuplicates(spellList){
+    removeDuplicates(powerList){
         //sort at n log n
-        let sortedList = Object.values(spellList).sort((a, b) => a.name.localeCompare(b.name));
+        let sortedList = Object.values(powerList).sort((a, b) => a.name.localeCompare(b.name));
 
         //search through sorted list for duplicates
         for (let index = 0; index < sortedList.length - 1;){
@@ -1269,7 +1269,7 @@ class CompendiumBrowser extends Application {
                 //TODO choose what to remove rather then the second
                 let remove = index + 1;
 
-                delete spellList[sortedList[remove].id];
+                delete powerList[sortedList[remove].id];
                 sortedList.splice(remove, 1);
             }
             else{
@@ -1290,12 +1290,12 @@ class CompendiumBrowser extends Application {
 
     initSettings() {
         let defaultSettings = {
-            loadedSpellCompendium: {},
+            loadedPowerCompendium: {},
             loadedNpcCompendium: {},
         };
         for (let compendium of game.packs) {
             if (compendium.documentName === "Item") {
-                defaultSettings.loadedSpellCompendium[compendium.collection] = {
+                defaultSettings.loadedPowerCompendium[compendium.collection] = {
                     load: true,
                     name: `${compendium['metadata']['label']} (${compendium.collection})`
                 };
@@ -1334,10 +1334,10 @@ class CompendiumBrowser extends Application {
         
         // load settings from container and apply to default settings (available compendie might have changed)
         let settings = game.settings.get(CMPBrowser.MODULE_NAME, 'settings');
-        for (let compKey in defaultSettings.loadedSpellCompendium) {
-            //v0.7.1 Check for settings.loadedSpellCompendium
-            if (settings.loadedSpellCompendium && (settings.loadedSpellCompendium[compKey] !== undefined)) {
-                defaultSettings.loadedSpellCompendium[compKey].load = settings.loadedSpellCompendium[compKey].load;
+        for (let compKey in defaultSettings.loadedPowerCompendium) {
+            //v0.7.1 Check for settings.loadedPowerCompendium
+            if (settings.loadedPowerCompendium && (settings.loadedPowerCompendium[compKey] !== undefined)) {
+                defaultSettings.loadedPowerCompendium[compKey].load = settings.loadedPowerCompendium[compKey].load;
             }
         }
         for (let compKey in defaultSettings.loadedNpcCompendium) {
@@ -1346,7 +1346,7 @@ class CompendiumBrowser extends Application {
                 defaultSettings.loadedNpcCompendium[compKey].load = settings.loadedNpcCompendium[compKey].load;
             }
         }
-        defaultSettings.allowSpellBrowser = settings.allowSpellBrowser ? true : false;
+        defaultSettings.allowPowerBrowser = settings.allowPowerBrowser ? true : false;
         defaultSettings.allowFeatBrowser = settings.allowFeatBrowser ? true : false;
         defaultSettings.allowItemBrowser = settings.allowItemBrowser ? true : false;
         defaultSettings.allowNpcBrowser = settings.allowNpcBrowser ? true : false;
@@ -1408,15 +1408,15 @@ class CompendiumBrowser extends Application {
 
     }
 
-    async addSpellFilters() {
-        // Spellfilters
+    async addPowerFilters() {
+        // Powerfilters
         //Foundry v10+ Item#data is now Item#system
         if (CompendiumBrowser.isFoundryV10Plus) {
 
-            this.addSpellFilter("CMPBrowser.general", "SW5E.Source", 'system.source', 'text');
-            this.addSpellFilter("CMPBrowser.general", "SW5E.Level", 'system.level', 'multiSelect', {0:"SW5E.PowerLevel0", 1:"SW5E.PowerLevel1", 2:"SW5E.PowerLevel2", 3:"SW5E.PowerLevel3", 4:"SW5E.PowerLevel4", 5:"SW5E.PowerLevel5", 6:"SW5E.PowerLevel6", 7:"SW5E.PowerLevel7", 8:"SW5E.PowerLevel8", 9:"SW5E.PowerLevel9"});
-            this.addSpellFilter("CMPBrowser.general", "SW5E.PowerSchool", 'system.school', 'select', CONFIG.SW5E.powerSchools);
-            this.addSpellFilter("CMPBrowser.general", "CMPBrowser.castingTime", 'system.activation.type', 'select',
+            this.addPowerFilter("CMPBrowser.general", "SW5E.Source", 'system.source', 'text');
+            this.addPowerFilter("CMPBrowser.general", "SW5E.Level", 'system.level', 'multiSelect', {0:"SW5E.PowerLevel0", 1:"SW5E.PowerLevel1", 2:"SW5E.PowerLevel2", 3:"SW5E.PowerLevel3", 4:"SW5E.PowerLevel4", 5:"SW5E.PowerLevel5", 6:"SW5E.PowerLevel6", 7:"SW5E.PowerLevel7", 8:"SW5E.PowerLevel8", 9:"SW5E.PowerLevel9"});
+            this.addPowerFilter("CMPBrowser.general", "SW5E.PowerSchool", 'system.school', 'select', CONFIG.SW5E.powerSchools);
+            this.addPowerFilter("CMPBrowser.general", "CMPBrowser.castingTime", 'system.activation.type', 'select',
                 {
                     action: "SW5E.Action",
                     bonus: "SW5E.BonusAction",
@@ -1426,10 +1426,10 @@ class CompendiumBrowser extends Application {
                     day: "SW5E.TimeDay"
                 }
             );
-            this.addSpellFilter("CMPBrowser.general", "CMPBrowser.spellType", 'system.actionType', 'select', CONFIG.SW5E.itemActionTypes);
-            this.addSpellFilter("CMPBrowser.general", "CMPBrowser.damageType", 'damageTypes', 'select', CONFIG.SW5E.damageTypes);
+            this.addPowerFilter("CMPBrowser.general", "CMPBrowser.powerType", 'system.actionType', 'select', CONFIG.SW5E.itemActionTypes);
+            this.addPowerFilter("CMPBrowser.general", "CMPBrowser.damageType", 'damageTypes', 'select', CONFIG.SW5E.damageTypes);
             //JV-082: Fix for missing "Class" search feature
-            this.addSpellFilter("CMPBrowser.general", "ITEM.TypeClass", 'classes', 'select',
+            this.addPowerFilter("CMPBrowser.general", "ITEM.TypeClass", 'classes', 'select',
                 {
                     consular: "CMPBrowser.consular",
                     engineer: "CMPBrowser.engineer",
@@ -1438,17 +1438,17 @@ class CompendiumBrowser extends Application {
                     sentinel: "CMPBrowser.sentinel"
                 }, true
             );
-            this.addSpellFilter("SW5E.PowerComponents", "SW5E.Ritual", 'system.components.ritual', 'bool');
-            this.addSpellFilter("SW5E.PowerComponents", "SW5E.Concentration", 'system.components.concentration', 'bool');
-            this.addSpellFilter("SW5E.PowerComponents", "SW5E.ComponentVerbal", 'system.components.vocal', 'bool');
-            this.addSpellFilter("SW5E.PowerComponents", "SW5E.ComponentSomatic", 'system.components.somatic', 'bool');
-            this.addSpellFilter("SW5E.PowerComponents", "SW5E.ComponentMaterial", 'system.components.material', 'bool');
+            this.addPowerFilter("SW5E.PowerComponents", "SW5E.Ritual", 'system.components.ritual', 'bool');
+            this.addPowerFilter("SW5E.PowerComponents", "SW5E.Concentration", 'system.components.concentration', 'bool');
+            this.addPowerFilter("SW5E.PowerComponents", "SW5E.ComponentVerbal", 'system.components.vocal', 'bool');
+            this.addPowerFilter("SW5E.PowerComponents", "SW5E.ComponentSomatic", 'system.components.somatic', 'bool');
+            this.addPowerFilter("SW5E.PowerComponents", "SW5E.ComponentMaterial", 'system.components.material', 'bool');
         }
         else {
-            this.addSpellFilter("CMPBrowser.general", "SW5E.Source", 'data.source', 'text');
-            this.addSpellFilter("CMPBrowser.general", "SW5E.Level", 'data.level', 'multiSelect', {0:"SW5E.PowerCantrip", 1:"1", 2:"2", 3:"3", 4:"4", 5:"5", 6:"6", 7:"7", 8:"8", 9:"9"});
-            this.addSpellFilter("CMPBrowser.general", "SW5E.PowerSchool", 'data.school', 'select', CONFIG.SW5E.powerSchools);
-            this.addSpellFilter("CMPBrowser.general", "CMPBrowser.castingTime", 'data.activation.type', 'select',
+            this.addPowerFilter("CMPBrowser.general", "SW5E.Source", 'data.source', 'text');
+            this.addPowerFilter("CMPBrowser.general", "SW5E.Level", 'data.level', 'multiSelect', {0:"SW5E.PowerCantrip", 1:"1", 2:"2", 3:"3", 4:"4", 5:"5", 6:"6", 7:"7", 8:"8", 9:"9"});
+            this.addPowerFilter("CMPBrowser.general", "SW5E.PowerSchool", 'data.school', 'select', CONFIG.SW5E.powerSchools);
+            this.addPowerFilter("CMPBrowser.general", "CMPBrowser.castingTime", 'data.activation.type', 'select',
                 {
                     action: "SW5E.Action",
                     bonus: "SW5E.BonusAction",
@@ -1458,9 +1458,9 @@ class CompendiumBrowser extends Application {
                     day: "SW5E.TimeDay"
                 }
             );
-            this.addSpellFilter("CMPBrowser.general", "CMPBrowser.powerType", 'data.actionType', 'select', CONFIG.SW5E.itemActionTypes);
-            this.addSpellFilter("CMPBrowser.general", "CMPBrowser.damageType", 'damageTypes', 'select', CONFIG.SW5E.damageTypes);
-            this.addSpellFilter("CMPBrowser.general", "ITEM.TypeClass", 'data.classes', 'select',
+            this.addPowerFilter("CMPBrowser.general", "CMPBrowser.powerType", 'data.actionType', 'select', CONFIG.SW5E.itemActionTypes);
+            this.addPowerFilter("CMPBrowser.general", "CMPBrowser.damageType", 'damageTypes', 'select', CONFIG.SW5E.damageTypes);
+            this.addPowerFilter("CMPBrowser.general", "ITEM.TypeClass", 'data.classes', 'select',
                 {
                     consular: "CMPBrowser.consular",
                     engineer: "CMPBrowser.engineer",
@@ -1469,11 +1469,11 @@ class CompendiumBrowser extends Application {
                     sentinel: "CMPBrowser.sentinel"
                 }, true
             );
-            this.addSpellFilter("SW5E.PowerComponents", "SW5E.Ritual", 'data.components.ritual', 'bool');
-            this.addSpellFilter("SW5E.PowerComponents", "SW5E.Concentration", 'data.components.concentration', 'bool');
-            this.addSpellFilter("SW5E.PowerComponents", "SW5E.ComponentVerbal", 'data.components.vocal', 'bool');
-            this.addSpellFilter("SW5E.PowerComponents", "SW5E.ComponentSomatic", 'data.components.somatic', 'bool');
-            this.addSpellFilter("SW5E.PowerComponents", "SW5E.ComponentMaterial", 'data.components.material', 'bool');
+            this.addPowerFilter("SW5E.PowerComponents", "SW5E.Ritual", 'data.components.ritual', 'bool');
+            this.addPowerFilter("SW5E.PowerComponents", "SW5E.Concentration", 'data.components.concentration', 'bool');
+            this.addPowerFilter("SW5E.PowerComponents", "SW5E.ComponentVerbal", 'data.components.vocal', 'bool');
+            this.addPowerFilter("SW5E.PowerComponents", "SW5E.ComponentSomatic", 'data.components.somatic', 'bool');
+            this.addPowerFilter("SW5E.PowerComponents", "SW5E.ComponentMaterial", 'data.components.material', 'bool');
         }
     }
 
@@ -1624,7 +1624,7 @@ class CompendiumBrowser extends Application {
         if (CompendiumBrowser.isFoundryV10Plus) {
             this.addNpcFilter("CMPBrowser.general", "SW5E.Source", 'system.details.source', 'text');
             this.addNpcFilter("CMPBrowser.general", "SW5E.Size", 'system.traits.size', 'select', CONFIG.SW5E.actorSizes);
-            this.addNpcFilter("CMPBrowser.general", "CMPBrowser.hasSpells", 'hasSpells', 'bool');
+            this.addNpcFilter("CMPBrowser.general", "CMPBrowser.hasPowers", 'hasPowers', 'bool');
             this.addNpcFilter("CMPBrowser.general", "CMPBrowser.hasLegAct", 'system.resources.legact.max', 'bool');
             this.addNpcFilter("CMPBrowser.general", "CMPBrowser.hasLegRes", 'system.resources.legres.max', 'bool');
             this.addNpcFilter("CMPBrowser.general", "SW5E.ChallengeRating", 'system.details.cr', 'numberCompare');
@@ -1632,7 +1632,7 @@ class CompendiumBrowser extends Application {
         else {
             this.addNpcFilter("CMPBrowser.general", "SW5E.Source", 'data.details.source', 'text');
             this.addNpcFilter("CMPBrowser.general", "SW5E.Size", 'data.traits.size', 'select', CONFIG.SW5E.actorSizes);
-            this.addNpcFilter("CMPBrowser.general", "CMPBrowser.hasSpells", 'hasSpells', 'bool');
+            this.addNpcFilter("CMPBrowser.general", "CMPBrowser.hasPowers", 'hasPowers', 'bool');
             this.addNpcFilter("CMPBrowser.general", "CMPBrowser.hasLegAct", 'data.resources.legact.max', 'bool');
             this.addNpcFilter("CMPBrowser.general", "CMPBrowser.hasLegRes", 'data.resources.legres.max', 'bool');
             this.addNpcFilter("CMPBrowser.general", "SW5E.ChallengeRating", 'data.details.cr', 'numberCompare');
@@ -1700,7 +1700,7 @@ class CompendiumBrowser extends Application {
     }
 
     /**
-     * Used to add custom filters to the Spell-Browser
+     * Used to add custom filters to the Power-Browser
      * @param {String} category - Title of the category
      * @param {String} label - Title of the filter
      * @param {String} path - path to the data that the filter uses. uses dotnotation. example: data.abilities.dex.value
@@ -1714,12 +1714,12 @@ class CompendiumBrowser extends Application {
      * @param {Boolean} possibleValues - predetermined values to choose from. needed for select and multiSelect, can be used in text filters
      * @param {Boolean} valIsArray - if the objects data is an object use this. the filter will check each property in the object (not recursive). if no match is found, the object will be hidden
      */
-    addSpellFilter(category, label, path, type, possibleValues = null, valIsArray = false) {
-        this.addFilter('spell', category, label, path, type, possibleValues, valIsArray);
+    addPowerFilter(category, label, path, type, possibleValues = null, valIsArray = false) {
+        this.addFilter('power', category, label, path, type, possibleValues, valIsArray);
     }
 
     /**
-     * Used to add custom filters to the Spell-Browser
+     * Used to add custom filters to the Power-Browser
      * @param {String} category - Title of the category
      * @param {String} label - Title of the filter
      * @param {String} path - path to the data that the filter uses. uses dotnotation. example: data.abilities.dex.value
@@ -1745,7 +1745,7 @@ class CompendiumBrowser extends Application {
         this.addFilter('item', category, label, path, type, possibleValues, valIsArray);
     }
 
-    async renderWith(tab="spell", filters=[]){
+    async renderWith(tab="power", filters=[]){
 
         //if there isn't a tab error out
         if(!this[`${tab}Filters`]){
@@ -1907,31 +1907,31 @@ class CompendiumBrowser extends Application {
 
     static async addTidySheetButton(cb, html, actor){
 
-        await html.find('.spell-browser-btn').remove();
+        await html.find('.power-browser-btn').remove();
 
-        let tabBar = html.find("div.tab.spellbook .spellcasting-ability")
+        let tabBar = html.find("div.tab.powerbook .Powercasting-ability")
         // console.log(tabBar)
-        const cbButton = $(`<div style="max-width:40px;min-width:32px;"><button class="compendium-browser spell-browser-btn"><i class="fa-duotone fa-book"></i></button></div>`);
+        const cbButton = $(`<div style="max-width:40px;min-width:32px;"><button class="compendium-browser power-browser-btn"><i class="fa-duotone fa-book"></i></button></div>`);
 
         tabBar.append(cbButton)
 
-        CompendiumBrowser.addSpellsButton(cbButton, actor.actor)
+        CompendiumBrowser.addPowersButton(cbButton, actor.actor)
     }
 
     static async addDefaultSheetButton(cb, html, actor){
 
-        await html.find('.spell-browser-btn').remove();
+        await html.find('.power-browser-btn').remove();
 
-        let tabBar = html.find("div.spellbook-filters")
+        let tabBar = html.find("div.powerbook-filters")
         // console.log(tabBar)
-        const cbButton = $(`<div style="max-width:40px;min-width:32px;"><button class="compendium-browser spell-browser-btn"><i class="fa-duotone fa-book"></i></button></div>`);
+        const cbButton = $(`<div style="max-width:40px;min-width:32px;"><button class="compendium-browser power-browser-btn"><i class="fa-duotone fa-book"></i></button></div>`);
 
         tabBar.append(cbButton)
 
-        CompendiumBrowser.addSpellsButton(cbButton, actor.actor)
+        CompendiumBrowser.addPowersButton(cbButton, actor.actor)
     }
 
-    static addSpellsButton(cbButton, character){
+    static addPowersButton(cbButton, character){
 
         cbButton.click(async ev => {
                 ev.preventDefault();
@@ -1941,7 +1941,7 @@ class CompendiumBrowser extends Application {
                 target = target.concat(CompendiumBrowser.findCasterClass(character));
                 target = target.concat(CompendiumBrowser.findMaxCasterLevel(character));
 
-                game.compendiumBrowser.renderWith("spell", target);
+                game.compendiumBrowser.renderWith("power", target);
             });
 
     }
@@ -1961,16 +1961,16 @@ class CompendiumBrowser extends Application {
 
     static findMaxCasterLevel(character){
 
-        //find max spell level
-        let maxLevel = Object.keys(character.system.powers).reduce((acc, spell)=>{
+        //find max Power level
+        let maxLevel = Object.keys(character.system.powers).reduce((acc, Power)=>{
             //special case for pact magic
-            if (spell == "pact"){
-                return Math.max(character.system.powers[spell].level, acc)
+            if (Power == "pact"){
+                return Math.max(character.system.powers[Power].level, acc)
             }
             else{
-                let spellObject = character.system.powers[spell];
-                if ((spellObject.override ?? spellObject.max) > 0){
-                    let match = spell.match(/spell(?<lvl>\d+)/);
+                let PowerObject = character.system.powers[Power];
+                if ((PowerObject.override ?? PowerObject.max) > 0){
+                    let match = Power.match(/power(?<lvl>\d+)/);
                     return Math.max(parseInt(match.groups.lvl), acc)
                 }
             }
@@ -1995,7 +1995,7 @@ Hooks.on('ready', async () => {
         await game.compendiumBrowser.initialize();
     }
 
-    game.compendiumBrowser.addSpellFilters();
+    game.compendiumBrowser.addPowerFilters();
     game.compendiumBrowser.addFeatFilters();
     game.compendiumBrowser.addItemFilters();
     game.compendiumBrowser.addNpcFilters();

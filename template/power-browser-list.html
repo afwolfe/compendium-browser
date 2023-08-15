@@ -1,0 +1,25 @@
+
+{{#each listItems as |power id|}}
+<li class="power flexrow draggable" data-entry-compendium="{{power.compendium}}" data-entry-id="{{id}}">
+    <div class="item-image">
+        <img class="" data-src="{{power.img}}" title="{{power.name}}" width="32" height="32"/>
+    </div>  
+    <div class="item-name">
+        <span class="item-edit" ><a title="({{power.compendium}})">{{power.name}}</a></span>
+    </div>
+    <div class="power-tags">
+        <span title="power level">{{#if power.data.level}}{{power.data.level}}{{else}}C{{/if}}</span>
+        <div class="spacer-large"></div>
+        <span {{#unless power.data.components.ritual}}style="color:#bbb;" title="{{localize "No"}} {{localize "SW5E.Ritual"}}"{{else}} title="{{localize "SW5E.Ritual"}}"{{/unless}}>R</span>
+        <span {{#unless power.data.components.concentration}}style="color:#bbb;" title="{{localize "No"}} {{localize "SW5E.Concentration"}}"{{else}} title="{{localize "SW5E.Concentration"}}"{{/unless}}>C</span>
+        <div class="spacer"></div>
+        <span {{#unless power.data.components.vocal}}style="color:#bbb;" title="{{localize "No"}} {{localize "SW5E.ComponentVerbal"}}"{{else}} title="{{localize "SW5E.ComponentVerbal"}}"{{/unless}}>V</span>
+        <span {{#unless power.data.components.somatic}}style="color:#bbb;" title="{{localize "No"}} {{localize "SW5E.ComponentSomatic"}}"{{else}} title="{{localize "SW5E.ComponentSomatic"}}"{{/unless}}>S</span>
+        <span {{#unless power.data.components.material}}style="color:#bbb;" title="no{{localize "No"}} {{localize "SW5E.ComponentMaterial"}}"{{else}} title="{{localize "SW5E.ComponentMaterial"}}"{{/unless}}>M</span>
+    </div>
+    <div class="filter-tags">                
+        <input type="hidden" name="level" value="{{power.data.level}}">
+    </div>
+</li>
+{{/each}}
+   

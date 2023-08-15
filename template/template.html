@@ -1,6 +1,6 @@
 <div class="parent">
     <div class="tabs">
-        {{#if showSpellBrowser}}<a class="item" data-tab="spell">{{localize "CMPBrowser.Tab.SpellBrowser"}}</a>{{/if}}
+        {{#if showPowerBrowser}}<a class="item" data-tab="power">{{localize "CMPBrowser.Tab.PowerBrowser"}}</a>{{/if}}
         {{#if showFeatBrowser}}<a class="item" data-tab="feat">{{localize "CMPBrowser.Tab.FeatBrowser"}}</a>{{/if}}
         {{#if showItemBrowser}}<a class="item" data-tab="item">{{localize "CMPBrowser.Tab.ItemBrowser"}}</a>{{/if}}
         {{#if showNpcBrowser}}<a class="item" data-tab="npc">{{localize "CMPBrowser.Tab.NPCBrowser"}}</a>{{/if}}
@@ -8,7 +8,7 @@
     </div>
 
     <div class="content">
-            <div class="tab" data-tab="spell">{{#if showSpellBrowser}}{{> "modules/compendium-browser/template/spell-browser.html"}}{{/if}}</div>
+            <div class="tab" data-tab="power">{{#if showPowerBrowser}}{{> "modules/compendium-browser/template/power-browser.html"}}{{/if}}</div>
             <div class="tab" data-tab="feat">{{#if showFeatBrowser}}{{> "modules/compendium-browser/template/feat-browser.html"}}{{/if}}</div>
             <div class="tab" data-tab="item">{{#if showItemBrowser}}{{> "modules/compendium-browser/template/item-browser.html"}}{{/if}}</div>
             <div class="tab" data-tab="npc">{{#if showNpcBrowser}}  {{> "modules/compendium-browser/template/npc-browser.html"}}{{/if}}</div>

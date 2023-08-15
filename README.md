@@ -1,5 +1,5 @@
 # Compendium Browser
-Tired of scrolling compendia? Easily browse and filter for spells, feats, items, and NPCs using Compendium Browser.
+Tired of scrolling compendia? Easily browse and filter for powers, feats, items, and NPCs using Compendium Browser.
 
 Compendium Browser is faster and better-behaved; **it no longer loads all the compendia into memory on start-up** (which sometimes hung servers because of memory or CPU requirements). Instead, it filters and loads on-demand, as well as giving you a Module Setting to control how many rows are loaded at a time.
 
@@ -20,9 +20,9 @@ Compendium Browser is faster and better-behaved; **it no longer loads all the co
 ![example](preview.jpg)
 
 ## Details
-Only the Gamemaster has access to the Settings, where they can enable or disable player access to the spell or npc-browser. It is **highly** recommended to disable any compendia that do not contain spell or should not be used in the NPC Browser. .
+Only the Gamemaster has access to the Settings, where they can enable or disable player access to the power or npc-browser. It is **highly** recommended to disable any compendia that do not contain power or should not be used in the NPC Browser. .
 
-This application enables anyone to add their own custom spell or npc filters via the api. After initialization the app can be found under game.compendiumBrowser where either addSpellFilter or addNpcFilter can be used to add a filter. This does support any data that the spell or npc has, including flags.
+This application enables anyone to add their own custom power or npc filters via the api. After initialization the app can be found under game.compendiumBrowser where either addpowerFilter or addNpcFilter can be used to add a filter. This does support any data that the power or npc has, including flags.
 
 All filters featured in the app are included in this manner and can be found in the compendium-browser.js at around line 726.
 
