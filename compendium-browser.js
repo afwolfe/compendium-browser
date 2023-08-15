@@ -78,7 +78,7 @@ class CompendiumBrowser extends Application {
             title: "CMPBrowser.compendiumBrowser",
             tabs: [{navSelector: ".tabs", contentSelector: ".content", initial: "power"}],
             classes: options.classes.concat('compendium-browser'),
-            template: "modules/compendium-browser/template/template.html",
+            template: "modules/compendium-browser-sw5e/template/template.html",
             width: 800,
             height: 700,
             resizable: true,
@@ -94,17 +94,17 @@ class CompendiumBrowser extends Application {
         } 
 
         await loadTemplates([
-            "modules/compendium-browser/template/power-browser.html",
-            "modules/compendium-browser/template/power-browser-list.html",       
-            "modules/compendium-browser/template/npc-browser.html",
-            "modules/compendium-browser/template/npc-browser-list.html",
-            "modules/compendium-browser/template/feat-browser.html",
-            "modules/compendium-browser/template/feat-browser-list.html",
-            "modules/compendium-browser/template/item-browser.html",
-            "modules/compendium-browser/template/item-browser-list.html",
-            "modules/compendium-browser/template/filter-container.html",
-            "modules/compendium-browser/template/settings.html",
-            "modules/compendium-browser/template/loading.html"
+            "modules/compendium-browser-sw5e/template/power-browser.html",
+            "modules/compendium-browser-sw5e/template/power-browser-list.html",       
+            "modules/compendium-browser-sw5e/template/npc-browser.html",
+            "modules/compendium-browser-sw5e/template/npc-browser-list.html",
+            "modules/compendium-browser-sw5e/template/feat-browser.html",
+            "modules/compendium-browser-sw5e/template/feat-browser-list.html",
+            "modules/compendium-browser-sw5e/template/item-browser.html",
+            "modules/compendium-browser-sw5e/template/item-browser-list.html",
+            "modules/compendium-browser-sw5e/template/filter-container.html",
+            "modules/compendium-browser-sw5e/template/settings.html",
+            "modules/compendium-browser-sw5e/template/loading.html"
         ]);
 
 
@@ -461,7 +461,7 @@ class CompendiumBrowser extends Application {
         //Provides extra info not in the standard SRD, like which classes can learn a power
         // FIXME: Update classList for sw5e
         // if (!this.classList) {
-        //     this.classList = await fetch('modules/compendium-browser/power-classes.json').then(result => {
+        //     this.classList = await fetch('modules/compendium-browser-sw5e/power-classes.json').then(result => {
         //         return result.json();
         //     }).then(obj => {
         //         return this.classList = obj;
@@ -471,7 +471,7 @@ class CompendiumBrowser extends Application {
 
         // FIXME: Update packList for sw5e
         // if (!this.packList) {
-        //     this.packList = await fetch('modules/compendium-browser/item-packs.json').then(result => {
+        //     this.packList = await fetch('modules/compendium-browser-sw5e/item-packs.json').then(result => {
         //         return result.json();
         //     }).then(obj => {
         //         return this.packList = obj;
@@ -481,7 +481,7 @@ class CompendiumBrowser extends Application {
 
         // FIXME: Update archetypes for sw5e
         // if (!this.archetypes) {
-        //     this.archetypes = await fetch('modules/compendium-browser/sub-classes.json').then(result => {
+        //     this.archetypes = await fetch('modules/compendium-browser-sw5e/sub-classes.json').then(result => {
         //         return result.json();
         //     }).then(obj => {
         //         return this.archetypes = obj;
@@ -860,7 +860,7 @@ class CompendiumBrowser extends Application {
     async renderLoading(messageElement, itemType, numLoaded, maxLoaded=false, doneLoading=false) {
         if (!messageElement) return;
 
-        let loadingHTML = await renderTemplate("modules/compendium-browser/template/loading.html", {numLoaded: numLoaded, itemType: itemType, maxLoaded: maxLoaded, doneLoading: doneLoading});
+        let loadingHTML = await renderTemplate("modules/compendium-browser-sw5e/template/loading.html", {numLoaded: numLoaded, itemType: itemType, maxLoaded: maxLoaded, doneLoading: doneLoading});
         messageElement.innerHTML = loadingHTML;
     }
 
@@ -871,7 +871,7 @@ class CompendiumBrowser extends Application {
         } else {
             listItems = await this.loadAndFilterItems(browserTab, updateLoading);
         }
-        const html = await renderTemplate(`modules/compendium-browser/template/${browserTab}-browser-list.html`, {listItems : listItems})
+        const html = await renderTemplate(`modules/compendium-browser-sw5e/template/${browserTab}-browser-list.html`, {listItems : listItems})
 
         return html;
     }

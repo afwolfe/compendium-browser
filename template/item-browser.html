@@ -14,12 +14,12 @@
             <button id="reset-item-filter">{{localize "CMPBrowser.Filters.ResetFilters"}}</button>
             <button id="copy-search-item">Export to JS</button>
         </div>
-        {{> "modules/compendium-browser/template/filter-container.html" filters=itemFilters}}
+        {{> "modules/compendium-browser-sw5e/template/filter-container.html" filters=itemFilters}}
     </div>
     <div class="list-area flexcol">
         <span id="CBItemsMessage" style="flex:0"></span>
         <ul id="CBItems">
-            {{> "modules/compendium-browser/template/item-browser-list.html" items=items}}
+            {{> "modules/compendium-browser-sw5e/template/item-browser-list.html" items=items}}
         </ul>
     </div>        
 </div>
