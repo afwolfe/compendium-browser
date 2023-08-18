@@ -70,6 +70,11 @@ const STOP_SEARCH = 'StopSearchException';
 // JV-080 - Adding a 'not-migrated' exception for v10 if the compendiums are not migrated to the new format (breaks e.g. npc compendium browser)
 const NOT_MIGRATED = 'NotMigratedException';
 
+const NON_CASTER_CLASSES = [ "berserker", "fighter", "monk", "operative", "scholar"];
+const FORCE_CASTER_CLASSES = ["consular", "guardian", "sentinel"];
+const TECH_CASTER_CLASSES = ["engineer", "scout"];
+const CASTER_CLASSES = FORCE_CASTER_CLASSES + TECH_CASTER_CLASSES;
+
 class CompendiumBrowser extends Application {
 
     static get defaultOptions() {
@@ -459,15 +464,6 @@ class CompendiumBrowser extends Application {
 
     async checkListsLoaded() {
         //Provides extra info not in the standard SRD, like which classes can learn a power
-        // FIXME: Update classList for sw5e
-        // if (!this.classList) {
-        //     this.classList = await fetch('modules/compendium-browser-sw5e/power-classes.json').then(result => {
-        //         return result.json();
-        //     }).then(obj => {
-        //         return this.classList = obj;
-        //     });
-        // }
-        this.classList = {};
 
         // FIXME: Update packList for sw5e
         // if (!this.packList) {
@@ -1028,6 +1024,7 @@ class CompendiumBrowser extends Application {
             item.damage = item5e.system?.damage;
             item.classes = item5e.system?.classes;
             item.requirements = item5e.system?.requirements;
+            item.school = item5e.system?.school;
         }
         else {
             item = item5e.data;
@@ -1036,6 +1033,7 @@ class CompendiumBrowser extends Application {
             item.damage = item.data?.damage;       // equivalent to: item5e.data.data.xxx - Ugh. The 'fold down' in v10 makes sense now. 
             item.classes = item.data?.classes;
             item.requirements = item.data?.requirements;
+            item.school = item5e.data?.school;
         }
         // getting damage types (common to all Items, although some won't have any)
         item.damageTypes = [];
@@ -1051,13 +1049,10 @@ class CompendiumBrowser extends Application {
 
         if (item.type === 'power') {
             // determining classes that can use the Power
-            let cleanPowerName = item.name.toLowerCase().replace(/[^一-龠ぁ-ゔァ-ヴーa-zA-Z0-9ａ-ｚＡ-Ｚ０-９々〆〤]/g, '').replace("'", '').replace(/ /g, '');
-            //let cleanPowerName = Power.name.toLowerCase().replace(/[^a-zA-Z0-9\s:]/g, '').replace("'", '').replace(/ /g, '');
-            if (this.classList[cleanPowerName]) {
-                let classes = this.classList[cleanPowerName];
-                item.classes = classes.split(',');
-            } else {
-                //FIXME: unfoundPowers += cleanPowerName + ',';
+            if (["lgt", "uni", "drk"].includes(item.school)) {
+                item.classes = FORCE_CASTER_CLASSES;
+            } else { // "tec"
+                item.classes = TECH_CASTER_CLASSES;
             }
         } else  if (item.type === 'feat' || item.type === 'class') {
             // getting class
@@ -1949,10 +1944,8 @@ class CompendiumBrowser extends Application {
 
     //find the first caster class of the character
     static findCasterClass(character){
-        const options = ["consular", "engineer", "guardian", "scout", "sentinel"]
-
         for (let cls of Object.keys(character.classes)){
-            if (options.includes(cls)){
+            if (CASTER_CLASSES.includes(cls)){
                 return [{"section":"CMPBrowsergeneral","label":"ITEMTypeClass","value":cls}];
             }
         }
