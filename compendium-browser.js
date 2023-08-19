@@ -753,6 +753,10 @@ class CompendiumBrowser extends Application {
             this.initSettings();
         }
         if (game.user.isGM || this.settings.allowPowerBrowser || this.settings.allowNpcBrowser) {
+            // Hide built-in SW5e system Compendium Browser
+            const nativeCompendiumBrowserTitle = game.i18n.localize("SW5E.CompendiumBrowser.Title");
+            html.find(".directory-footer button").text(nativeCompendiumBrowserTitle)[0].remove();
+
             const cbButton = $(`<button class="compendium-browser-btn"><i class="fas fa-fire"></i> ${game.i18n.localize("CMPBrowser.compendiumBrowser")}</button>`);
             html.find('.compendium-browser-btn').remove();
 
